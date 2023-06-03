@@ -2,6 +2,7 @@
 #include"helpers/buffer.h"
 #include"helpers/vector.h"
 #include<string.h>
+#include<assert.h>
 
 #define LEX_GETC_IF(buffer, c, exp)     \
     for(c = peekc(); exp; c = peekc())  \
@@ -90,6 +91,24 @@ struct token* token_make_number()
     return token_make_number_for_value(read_number());
 }
 
+struct token* token_make_string(char start_delmt, char end_delmt)
+{
+    struct buffer* buff = buffer_create();
+    assert(nextc() == start_delmt);
+    char c = nextc();
+    for(; c != end_delmt && c != EOF; c = nextc())
+    {
+        if(c == '\\')
+        {
+            // 跳过 反斜杠'\'
+            continue;
+        }
+        buffer_write(buff, c);
+    }
+    buffer_write(buff, 0x00);
+    return token_create(&(struct token){.type = TOKEN_TYPE_STRING, .svar = buffer_ptr(buff)});
+}
+
 struct token* read_next_token()
 {
     struct token* token = NULL;
@@ -98,6 +117,9 @@ struct token* read_next_token()
     {
         NUMERIC_CASE:
             token = token_make_number();
+            break;
+        case '"':
+            token = token_make_string('"', '"');
             break;
         case ' ':
         case '\t':
@@ -125,6 +147,7 @@ int lex(struct lex_process* process)
     struct token* token = read_next_token();
     while(token)
     {
+        printf("%s\n", token->svar);
         vector_push(lexer->token_vec, token);
         token = read_next_token();
     }

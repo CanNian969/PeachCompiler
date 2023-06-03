@@ -43,6 +43,7 @@ struct compile_process *compile_process_create(const char* filename, const char*
     process->ifile.fp = infile;
     process->ifile.abs_path = filename;
     process->ofile = outfile;
+    process->pos.filename = filename;
     return process;
 }
 

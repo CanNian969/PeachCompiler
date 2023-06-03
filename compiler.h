@@ -108,6 +108,7 @@ struct lex_process
 
     // ((50))   later explain
     int current_expression_count;
+    // 括号buffer
     struct buffer* parentheses_buffer;
     struct lex_process_functions* function;
 
