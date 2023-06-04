@@ -9,6 +9,6 @@ int main()
     else if(res == COMPILER_FAILED_WITH_ERROR)
         printf("Compile failed\n");
     else
-        printf("Unknown response for compile file");
+        printf("Unknown response for compile file\n");
     return 0;
 }

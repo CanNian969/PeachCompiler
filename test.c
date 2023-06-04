@@ -1,1 +1,1 @@
-"hello world\n" 124 334 432
+"hello world\n" 124 334 20 + 1 +2 +33 ++ +*
