@@ -36,10 +36,20 @@
     case '|':                            \
     case '&':                            \
     case '(':                            \
-    case '{':                            \
+    case '[':                            \
     case ',':                            \
     case '.':                            \
     case '?'
+
+#define SYMBOL_CASE \
+    case '{':       \
+    case '}':       \
+    case ':':       \
+    case ';':       \
+    case '#':       \
+    case '\\':      \
+    case ')':       \
+    case ']'
 
 enum
 {
@@ -69,7 +79,7 @@ struct pos
 {
     int line;
     int col;
-    // 记录token是哪个头文件里的
+    // 记录token/process是哪个头文件里的
     const char *filename;
 };
 
@@ -162,6 +172,6 @@ struct vector *lex_process_tokens(struct lex_process *lexer);
 int lex(struct lex_process *process);
 
 // token.c
-bool token_is_keyword(struct token* token, const char* keyword);
+bool token_is_keyword(struct token *token, const char *keyword);
 
 #endif

@@ -39,11 +39,9 @@ struct compile_process *compile_process_create(const char* filename, const char*
     process->flags = flags;
     process->pos.line = 1;
     process->pos.col = 1;
-    // process->pos.filename
     process->ifile.fp = infile;
     process->ifile.abs_path = filename;
     process->ofile = outfile;
-    process->pos.filename = filename;
     return process;
 }
 
