@@ -94,8 +94,18 @@ struct compile_process
         FILE *fp;
         const char *abs_path;
     } ifile;
+    // A vector of tokens from lexical analysis
+    struct vector *token_vec;
     // outfile
     FILE *ofile;
+};
+
+enum
+{
+    NUMBER_TYPE_NORMAL,
+    NUMBER_TYPE_LONG,
+    NUMBER_TYPE_FLOAT,
+    NUMBER_TYPE_DOUBLE
 };
 
 struct token
@@ -113,6 +123,12 @@ struct token
         unsigned long long llnum;
         void *any;
     };
+
+    struct token_number
+    {
+        // 123L; for long
+        int type;
+    } num;
 
     //  与下一个token之间是否有空格，eg: * a -> operator token *和a之间
     bool whitespace;
@@ -147,7 +163,7 @@ struct lex_process
     struct lex_process_functions *function;
 
     // 使用者知道而lex不知道的私人变量
-    void *private;
+    void *lex_private;
 };
 
 // compiler.c
@@ -163,13 +179,17 @@ char compile_process_peek_char(struct lex_process *lexer);
 void compile_process_push_char(struct lex_process *lexer, char c);
 
 // lex_process.c
-struct lex_process *lex_process_create(struct compile_process *compiler, struct lex_process_functions *function, void *private);
+struct lex_process *lex_process_create(struct compile_process *compiler, struct lex_process_functions *function, void *lex_private);
 void lex_process_free(struct lex_process *lexer);
 void *lex_process_private(struct lex_process *lexer);
 struct vector *lex_process_tokens(struct lex_process *lexer);
 
 // lexer.c
 int lex(struct lex_process *process);
+/**
+ * @brief 从字符串中构造token
+*/
+struct lex_process *token_build_for_string(struct compile_process *compiler, const char *str);
 
 // token.c
 bool token_is_keyword(struct token *token, const char *keyword);

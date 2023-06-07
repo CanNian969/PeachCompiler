@@ -20,7 +20,7 @@ int compile_file(const char* filename, const char* out_filename, int flags)
 
     if(lex(lexer) != LEXICAL_ANALYSIS_ALL_OK)
         return COMPILER_FAILED_WITH_ERROR;
-
+    cprocess->token_vec = lexer->token_vec;
     // Preform parsing
 
     // Preform code generator
