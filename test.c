@@ -2,7 +2,7 @@
 [#] 123abc acbc_123
 unsigned int ulong
 //hello world
-/***hello ***/
-'c'
+/***hello ***/ 'b' 'c'
+'f' 'e'
 0xAb34 x11
 0b110

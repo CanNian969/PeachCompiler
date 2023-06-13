@@ -83,6 +83,7 @@ struct pos
     const char *filename;
 };
 
+struct node;
 struct compile_process
 {
     // 标记文件该如何编译
@@ -96,6 +97,10 @@ struct compile_process
     } ifile;
     // A vector of tokens from lexical analysis
     struct vector *token_vec;
+
+    struct vector *node_vec;
+    struct vector *node_tree_vec;
+
     // outfile
     FILE *ofile;
 };
@@ -116,8 +121,8 @@ struct token
 
     union
     {
-        char cvar;
-        const char *svar;
+        char cval;
+        const char *sval;
         unsigned int inum;
         unsigned long lnum;
         unsigned long long llnum;
@@ -166,6 +171,71 @@ struct lex_process
     void *lex_private;
 };
 
+enum
+{
+    PARSE_ALL_OK,
+    PARSE_GENERAL_ERROR
+};
+
+enum
+{
+    NODE_TYPE_EXPRESSION,
+    NODE_TYPE_EXPRESSION_PARENTHESES,
+    NODE_TYPE_NUMBER,
+    NODE_TYPE_IDENTIFIER,
+    NODE_TYPE_STRING,
+    NODE_TYPE_VARIABLE,
+    NODE_TYPE_VARIABLE_LIST,
+    NODE_TYPE_FUNCTION,
+    NODE_TYPE_BODY,
+    NODE_TYPE_STATEMENT_RETURN,
+    NODE_TYPE_STATEMENT_IF,
+    NODE_TYPE_STATEMENT_ELSE,
+    NODE_TYPE_STATEMENT_WHILE,
+    NODE_TYPE_STATEMENT_DO_WHILE,
+    NODE_TYPE_STATEMENT_FOR,
+    NODE_TYPE_STATEMENT_BREAK,
+    NODE_TYPE_STATEMENT_CONTINUE,
+    NODE_TYPE_STATEMENT_SWITCH,
+    NODE_TYPE_STATEMENT_CASE,
+    NODE_TYPE_STATEMENT_DEFAULT,
+    NODE_TYPE_STATEMENT_GOTO,
+
+    NODE_TYPE_UNARY,
+    NODE_TYPE_TENARY,
+    NODE_TYPE_LABEL,
+    NODE_TYPE_STRUCT,
+    NODE_TYPE_UNION,
+    NODE_TYPE_BRACKET,
+    NODE_TYPE_CAST,
+    NODE_TYPE_BLANK
+};
+
+struct node
+{
+    int type;
+    int flag;
+    struct pos pos;
+
+    struct node_binded
+    {
+        // 指向body node
+        struct node *owner;
+        // 指向该node所在的func
+        struct node *function;
+    } binded;
+
+    // 字面量
+    union
+    {
+        char cval;
+        const char *sval;
+        unsigned int inum;
+        unsigned long lnum;
+        unsigned long llnum;
+    };
+};
+
 // compiler.c
 int compile_file(const char *filename, const char *out_filename, int flags);
 
@@ -188,10 +258,23 @@ struct vector *lex_process_tokens(struct lex_process *lexer);
 int lex(struct lex_process *process);
 /**
  * @brief 从字符串中构造token
-*/
+ */
 struct lex_process *token_build_for_string(struct compile_process *compiler, const char *str);
 
 // token.c
 bool token_is_keyword(struct token *token, const char *keyword);
+bool token_is_symbol(struct token *token, char c);
+bool token_is_nl_or_comment_or_newline_seperator(struct token *token);
+
+// parser.c
+int parse(struct compile_process *process);
+
+// node.c
+void node_set_vector(struct vector *vec, struct vector *vec_root);
+void node_push(struct node *node);
+struct node *node_peek_or_null();
+struct node *node_peek();
+struct node *node_pop();
+struct node *node_create(struct node *_node);
 
 #endif
